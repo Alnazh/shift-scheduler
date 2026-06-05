@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Simulasi Optimasi Penjadwalan Shift Karyawan, B.5 Nonlinear Problems" />
+  <title>Shift Scheduler - Kecerdasan Buatan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+
+<body>
+
+<!-- ══════════════════════════════════════════════
+     HEADER
+     ══════════════════════════════════════════════ -->
+<header class="app-header d-flex align-items-center gap-3">
+  <div class="header-icon">📅</div>
+  <div class="flex-grow-1">
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+      <h1>Implementasi Genetic Algorithm pada Sistem Penjadwalan Shift Kerja</h1>
+      <span class="badge-subtopik">B.5 - Optimization in Nonlinear Problems</span>
+    </div>
+    <p>Hill Climbing &nbsp;·&nbsp; Simulated Annealing &nbsp;·&nbsp; Genetic Algorithm &nbsp;·&nbsp; Studi Kasus: Penjadwalan Shift Karyawan</p>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     LAYOUT: SIDEBAR + KONTEN
+     ══════════════════════════════════════════════ -->
+<div class="d-flex layout-wrapper">
+
+  <!-- ── SIDEBAR KIRI - hanya navigasi & constraint ── -->
+  <aside class="sidebar">
+
+    <div class="sidebar-section-label">Pilih Algoritma</div>
+    <ul class="nav nav-pills flex-column mb-3" id="nav-algoritma" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active w-100 text-start mb-1" id="tab-hc"
+          data-bs-toggle="pill" data-bs-target="#dummy-hc" type="button" role="tab">
+          <span class="algo-icon">🏔️</span> Hill Climbing
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link w-100 text-start mb-1" id="tab-sa"
+          data-bs-toggle="pill" data-bs-target="#dummy-sa" type="button" role="tab">
+          <span class="algo-icon">🌡️</span> Simulated Annealing
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link w-100 text-start mb-1" id="tab-ga"
+          data-bs-toggle="pill" data-bs-target="#dummy-ga" type="button" role="tab">
+          <span class="algo-icon">🧬</span> Genetic Algorithm
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link w-100 text-start mb-1" id="tab-komp"
+          data-bs-toggle="pill" data-bs-target="#dummy-komp" type="button" role="tab">
+          <span class="algo-icon">📊</span> Komparatif B.5
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link w-100 text-start mb-1" id="tab-tentang"
+          data-bs-toggle="pill" data-bs-target="#dummy-tentang" type="button" role="tab">
+          <span class="algo-icon">📖</span> Tentang Algoritma
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link w-100 text-start" id="tab-panduan"
+          data-bs-toggle="pill" data-bs-target="#dummy-panduan" type="button" role="tab">
+          <span class="algo-icon">📝</span> Panduan Parameter
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link w-100 text-start mt-1" id="tab-karyawan"
+          data-bs-toggle="pill" data-bs-target="#dummy-karyawan" type="button" role="tab">
+          <span class="algo-icon">👥</span> Kelola Karyawan
+        </button>
+      </li>
+    </ul>
+
+    <!-- Dummy target untuk Bootstrap pill (tidak ditampilkan) -->
+    <div class="d-none">
+      <div id="dummy-hc"></div>
+      <div id="dummy-sa"></div>
+      <div id="dummy-ga"></div>
+      <div id="dummy-komp"></div>
+      <div id="dummy-tentang"></div>
+      <div id="dummy-panduan"></div>
+      <div id="dummy-karyawan"></div>
+    </div>
+
+    <hr class="sidebar-divider" />
+
+    <!-- Constraint Jadwal -->
+    <div class="sidebar-section-label">Constraint Jadwal</div>
+    <div class="sidebar-constraint-list">
+      <div>👥 Pagi ≥ 2 karyawan/hari</div>
+      <div>👥 Siang ≥ 2 karyawan/hari</div>
+      <div>👥 Malam ≥ 1 karyawan/hari</div>
+      <div>📅 Maks. 5 hari kerja/minggu</div>
+      <div>🌙 Min. 2 hari libur/minggu</div>
+      <div>⚠️ Dilarang Malam → Pagi</div>
+    </div>
+
+  </aside><!-- /sidebar -->
+
+  <!-- ══════════════════════════════════════════════
+       PANEL KANAN: PARAMETER + HASIL
+       ══════════════════════════════════════════════ -->
+  <main class="konten-utama">
+    <div id="tab-hasil-content">
+
+      <!-- ════════ TAB: HILL CLIMBING ════════ -->
+      <div class="tab-panel" id="hasil-hc">
+
+        <!-- Panel Parameter HC -->
+        <div class="panel-param card mb-3">
+          <div class="card-header d-flex align-items-center justify-content-between">
+            <span>⚙️ Parameter Hill Climbing</span>
+          </div>
+          <div class="card-body">
+            <div class="row g-3 align-items-end">
+              <!-- Varian -->
+              <div class="col-12 col-md-4">
+                <div class="sidebar-section-label mb-2">Varian</div>
+                <div class="d-flex gap-2 flex-wrap">
+                  <button class="btn-varian aktif" data-varian="simple">Simple</button>
+                  <button class="btn-varian" data-varian="steepest">Steepest</button>
+                  <button class="btn-varian" data-varian="stochastic">Stochastic</button>
+                </div>
+              </div>
+              <!-- Slider Iterasi -->
+              <div class="col-12 col-md-6">
+                <div class="d-flex justify-content-between align-items-center">
+                  <label class="form-label mb-0">Jumlah Langkah</label>
+                  <span class="nilai-param" id="hc-iterasi-val">5000</span>
+                </div>
+                <span class="keterangan-param">Berapa kali algoritma mencoba perbaikan</span>
+                <input type="range" class="form-range" id="hc-iterasi" min="500" max="5000" step="500" value="5000" />
+              </div>
+              <!-- Tombol -->
+              <div class="col-12 col-md-2">
+                <button class="btn-jalankan" id="btn-hc">▶ Jalankan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hasil HC -->
+        <div id="hc-panel-hasil">
+          <div class="state-kosong">
+            <div class="ikon">🏔️</div>
+            <div class="teks">Belum ada hasil Hill Climbing</div>
+            <div class="teks2">Pilih varian, atur parameter, lalu klik Jalankan</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ TAB: SIMULATED ANNEALING ════════ -->
+      <div class="tab-panel d-none" id="hasil-sa">
+
+        <!-- Panel Parameter SA -->
+        <div class="panel-param card mb-3">
+          <div class="card-header">⚙️ Parameter Simulated Annealing</div>
+          <div class="card-body">
+            <div class="row g-3 align-items-end">
+              <div class="col-12 col-md-3">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Eksplorasi Awal</label>
+                  <span class="nilai-param" id="sa-suhu-val">10</span>
+                </div>
+                <span class="keterangan-param">Semakin besar → lebih bebas eksplorasi</span>
+                <input type="range" class="form-range" id="sa-suhu" min="1" max="50" step="1" value="10" />
+              </div>
+              <div class="col-12 col-md-3">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Kecepatan Fokus (α)</label>
+                  <span class="nilai-param" id="sa-alpha-val">99.5%</span>
+                </div>
+                <span class="keterangan-param">Seberapa cepat eksplorasi dikurangi</span>
+                <input type="range" class="form-range" id="sa-alpha" min="0.90" max="0.999" step="0.001" value="0.995" />
+              </div>
+              <div class="col-12 col-md-2">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Batas Fokus</label>
+                  <span class="nilai-param" id="sa-suhu-min-val">0.001</span>
+                </div>
+                <span class="keterangan-param">Berhenti saat mencapai nilai ini</span>
+                <input type="range" class="form-range" id="sa-suhu-min" min="0.0001" max="1.0" step="0.0001" value="0.001" />
+              </div>
+              <div class="col-12 col-md-2">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Jumlah Langkah</label>
+                  <span class="nilai-param" id="sa-iterasi-val">3000</span>
+                </div>
+                <span class="keterangan-param">Batas maksimum percobaan</span>
+                <input type="range" class="form-range" id="sa-iterasi" min="500" max="10000" step="500" value="3000" />
+              </div>
+              <div class="col-12 col-md-2">
+                <button class="btn-jalankan" id="btn-sa">▶ Jalankan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hasil SA -->
+        <div id="sa-panel-hasil">
+          <div class="state-kosong">
+            <div class="ikon">🌡️</div>
+            <div class="teks">Belum ada hasil Simulated Annealing</div>
+            <div class="teks2">Atur parameter lalu klik Jalankan</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ TAB: GENETIC ALGORITHM ════════ -->
+      <div class="tab-panel d-none" id="hasil-ga">
+
+        <!-- Panel Parameter GA -->
+        <div class="panel-param card mb-3">
+          <div class="card-header">⚙️ Parameter Genetic Algorithm</div>
+          <div class="card-body">
+            <div class="row g-3 align-items-end">
+              <div class="col-6 col-md-2">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Jumlah Solusi</label>
+                  <span class="nilai-param" id="ga-populasi-val">50</span>
+                </div>
+                <span class="keterangan-param">Solusi per generasi</span>
+                <input type="range" class="form-range" id="ga-populasi" min="10" max="200" step="5" value="50" />
+              </div>
+              <div class="col-6 col-md-2">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Generasi</label>
+                  <span class="nilai-param" id="ga-generasi-val">100</span>
+                </div>
+                <span class="keterangan-param">Jumlah evolusi</span>
+                <input type="range" class="form-range" id="ga-generasi" min="10" max="500" step="10" value="100" />
+              </div>
+              <div class="col-6 col-md-2">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Kawin Silang</label>
+                  <span class="nilai-param" id="ga-crossover-val">80%</span>
+                </div>
+                <span class="keterangan-param">Peluang crossover</span>
+                <input type="range" class="form-range" id="ga-crossover" min="0.1" max="1.0" step="0.05" value="0.8" />
+              </div>
+              <div class="col-6 col-md-2">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Mutasi</label>
+                  <span class="nilai-param" id="ga-mutasi-val">2.0%</span>
+                </div>
+                <span class="keterangan-param">Peluang mutasi per gen</span>
+                <input type="range" class="form-range" id="ga-mutasi" min="0.001" max="0.3" step="0.001" value="0.02" />
+              </div>
+              <div class="col-6 col-md-1">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Elit</label>
+                  <span class="nilai-param" id="ga-elit-val">2</span>
+                </div>
+                <span class="keterangan-param">Dijaga</span>
+                <input type="range" class="form-range" id="ga-elit" min="0" max="10" step="1" value="2" />
+              </div>
+              <div class="col-6 col-md-1">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Seleksi K</label>
+                  <span class="nilai-param" id="ga-tournament-val">3</span>
+                </div>
+                <span class="keterangan-param">Tournament</span>
+                <input type="range" class="form-range" id="ga-tournament" min="2" max="10" step="1" value="3" />
+              </div>
+              <div class="col-12 col-md-2">
+                <button class="btn-jalankan" id="btn-ga">▶ Jalankan</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hasil GA -->
+        <div id="ga-panel-hasil">
+          <div class="state-kosong">
+            <div class="ikon">🧬</div>
+            <div class="teks">Belum ada hasil Genetic Algorithm</div>
+            <div class="teks2">Atur parameter lalu klik Jalankan</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ TAB: KOMPARATIF ════════ -->
+      <div class="tab-panel d-none" id="hasil-komp">
+
+        <!-- Panel Parameter Komparatif -->
+        <div class="panel-param card mb-3">
+          <div class="card-header">⚙️ Parameter Komparatif B.5</div>
+          <div class="card-body">
+            <div class="row g-3 align-items-end">
+              <div class="col-12 col-md-8">
+                <div class="d-flex justify-content-between">
+                  <label class="form-label mb-0">Maks. Iterasi / Generasi</label>
+                  <span class="nilai-param" id="komp-iterasi-val">5000</span>
+                </div>
+                <span class="keterangan-param">
+                  Batas iterasi untuk semua algoritma. Menjalankan HC Simple, HC Steepest,
+                  HC Stochastic, SA, dan GA secara bersamaan pada masalah yang sama.
+                </span>
+                <input type="range" class="form-range" id="komp-iterasi" min="1000" max="5000" step="500" value="5000" />
+              </div>
+              <div class="col-12 col-md-4">
+                <button class="btn-jalankan" id="btn-komp">▶ Jalankan Semua</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hasil Komparatif -->
+        <div id="komp-panel-hasil">
+          <div class="state-kosong">
+            <div class="ikon">📊</div>
+            <div class="teks">Mode Komparatif B.5</div>
+            <div class="teks2">Klik "Jalankan Semua" untuk membandingkan semua algoritma</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════ TAB: TENTANG ALGORITMA ════════ -->
+      <div class="tab-panel d-none" id="hasil-tentang">
+        <div class="tentang-wrapper">
+
+          <div class="tentang-judul-utama mb-4">
+            <h2>📖 Tentang Algoritma Optimasi</h2>
+            <p>Penjelasan konsep, cara kerja, dan implementasi tiga algoritma pencarian lokal
+               yang digunakan pada studi kasus penjadwalan shift karyawan.</p>
+          </div>
+
+          <!-- Studi Kasus -->
+          <div class="card tentang-card mb-4">
+            <div class="card-header">🏭 Studi Kasus: Penjadwalan Shift Karyawan</div>
+            <div class="card-body">
+              <div class="row g-4">
+                <div class="col-12 col-md-6">
+                  <h6 class="tentang-sub">Deskripsi Problem</h6>
+                  <p class="tentang-teks">
+                    Penjadwalan shift karyawan adalah masalah optimasi <strong>nonlinear NP-hard</strong>.
+                    Dengan 10 karyawan, 4 jenis shift (Pagi, Siang, Malam, Libur), dan 7 hari,
+                    terdapat <strong>4<sup>70</sup> ≈ 10<sup>42</sup></strong> kemungkinan jadwal yang
+                    mustahil diperiksa satu per satu.
+                  </p>
+                  <p class="tentang-teks mt-2">
+                    Algoritma pencarian lokal bekerja dengan cara mencoba <strong>jadwal tetangga</strong>,
+                    yaitu jadwal baru yang hanya berbeda satu perubahan kecil dari jadwal saat ini
+                    (misalnya: mengubah shift Andi di hari Senin dari Pagi menjadi Siang).
+                    Dengan cara ini, algoritma menjelajahi ruang solusi secara efisien tanpa
+                    harus memeriksa semua kemungkinan.
+                  </p>
+                  <p class="tentang-teks mt-2">
+                    Kualitas setiap jadwal diukur menggunakan <strong>fungsi fitness</strong>.
+                    Semakin sedikit aturan yang dilanggar, semakin tinggi nilai fitness-nya.
+                    Jadwal yang memenuhi semua aturan akan mendapat nilai fitness 1.0.
+                  </p>
+                </div>
+                <div class="col-12 col-md-6">
+                  <h6 class="tentang-sub">Constraint yang Harus Dipenuhi</h6>
+                  <ul class="tentang-list">
+                    <li>Shift Pagi minimal <strong>2 karyawan</strong> per hari</li>
+                    <li>Shift Siang minimal <strong>2 karyawan</strong> per hari</li>
+                    <li>Shift Malam minimal <strong>1 karyawan</strong> per hari</li>
+                    <li>Setiap karyawan maksimal <strong>5 hari kerja</strong> per minggu</li>
+                    <li>Setiap karyawan minimal <strong>2 hari libur</strong> per minggu</li>
+                    <li>Dilarang jadwal <strong>Malam kemudian Pagi</strong> keesokan hari (anti-fatigue)</li>
+                  </ul>
+                  <div class="tentang-formula mt-3">
+                    <div class="tentang-formula-label">Fungsi Fitness</div>
+                    <div class="tentang-formula-isi">fitness = 1 / (1 + total_pelanggaran)</div>
+                    <div class="tentang-formula-ket">Nilai 1.0 berarti tidak ada pelanggaran sama sekali (jadwal sempurna)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Hill Climbing -->
+          <div class="card tentang-card mb-4">
+            <div class="card-header tentang-header-hc">🏔️ Hill Climbing Algorithm</div>
+            <div class="card-body">
+              <p class="tentang-teks mb-3">
+                Mulai dari jadwal acak, terus bergerak ke jadwal yang lebih baik (tetangga)
+                hingga tidak ada lagi yang bisa diperbaiki.
+              </p>
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-4">
+                  <div class="tentang-varian-card">
+                    <div class="tentang-varian-judul">Simple HC</div>
+                    <div class="tentang-varian-isi">Evaluasi <strong>1 tetangga</strong> acak per langkah. Langsung pindah jika lebih baik atau sama baik.</div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="tentang-varian-card">
+                    <div class="tentang-varian-judul">Steepest-Ascent HC</div>
+                    <div class="tentang-varian-isi">Evaluasi <strong>80 tetangga</strong> sekaligus, pilih yang terbaik. Lebih cermat per langkah.</div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="tentang-varian-card">
+                    <div class="tentang-varian-judul">Stochastic HC</div>
+                    <div class="tentang-varian-isi">Pilih tetangga <strong>secara acak</strong>. Hasil bisa berbeda tiap run, wajar untuk algoritma stochastic.</div>
+                  </div>
+                </div>
+              </div>
+              <div class="tentang-kelemahan mt-3">
+                ⚠️ <strong>Kelemahan:</strong> Mudah terjebak di <em>local optimum</em>, yaitu solusi yang lebih baik dari sekitarnya tapi bukan yang terbaik secara global.
+              </div>
+            </div>
+          </div>
+
+          <!-- Simulated Annealing -->
+          <div class="card tentang-card mb-4">
+            <div class="card-header tentang-header-sa">🌡️ Simulated Annealing</div>
+            <div class="card-body">
+              <p class="tentang-teks mb-3">
+                Terinspirasi dari pendinginan logam. Keunggulan utama: SA bisa
+                <strong>menerima solusi yang lebih buruk</strong> dengan probabilitas tertentu
+                untuk keluar dari jebakan <em>local optimum</em> yang sering dialami Hill Climbing.
+                Inilah yang membuat SA lebih andal dalam menemukan solusi mendekati optimal global.
+              </p>
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-4">
+                  <div class="tentang-param-card">
+                    <div class="tentang-param-nama">Eksplorasi Awal (T₀)</div>
+                    <div class="tentang-param-isi">Semakin besar → lebih bebas menerima solusi buruk di awal.</div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="tentang-param-card">
+                    <div class="tentang-param-nama">Kecepatan Fokus (α)</div>
+                    <div class="tentang-param-isi">Seberapa cepat probabilitas penerimaan solusi buruk menurun.</div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-4">
+                  <div class="tentang-param-card">
+                    <div class="tentang-param-nama">Probabilitas Boltzmann</div>
+                    <div class="tentang-param-isi">P = exp(−Δ/T). Saat T tinggi → sering terima solusi buruk.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Genetic Algorithm -->
+          <div class="card tentang-card mb-4">
+            <div class="card-header tentang-header-ga">🧬 Genetic Algorithm</div>
+            <div class="card-body">
+              <p class="tentang-teks mb-3">
+                Terinspirasi evolusi biologis. Memelihara <strong>populasi jadwal</strong>
+                dan menggunakan seleksi, crossover, serta mutasi untuk menghasilkan generasi
+                yang semakin baik.
+              </p>
+              <div class="row g-3 mb-4">
+                <div class="col-6 col-md-3">
+                  <div class="tentang-komponen-card">
+                    <div class="tentang-komponen-ikon">🧬</div>
+                    <div class="tentang-komponen-judul">Kromosom</div>
+                    <div class="tentang-komponen-isi">Satu jadwal mingguan lengkap (10 karyawan × 7 hari)</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="tentang-komponen-card">
+                    <div class="tentang-komponen-ikon">🏆</div>
+                    <div class="tentang-komponen-judul">Seleksi Tournament</div>
+                    <div class="tentang-komponen-isi">Ambil k kromosom acak, pilih yang fitness-nya tertinggi</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="tentang-komponen-card">
+                    <div class="tentang-komponen-ikon">✂️</div>
+                    <div class="tentang-komponen-judul">Crossover</div>
+                    <div class="tentang-komponen-isi">Single-point: gabungkan segmen dari dua jadwal induk</div>
+                  </div>
+                </div>
+                <div class="col-6 col-md-3">
+                  <div class="tentang-komponen-card">
+                    <div class="tentang-komponen-ikon">🎲</div>
+                    <div class="tentang-komponen-judul">Mutasi</div>
+                    <div class="tentang-komponen-isi">Ubah shift satu slot secara acak dengan probabilitas kecil</div>
+                  </div>
+                </div>
+              </div>
+              <div class="tentang-kelemahan mt-3">
+                ✅ <strong>Keunggulan:</strong> Jarang terjebak local optimum karena banyak solusi dicoba bersamaan setiap generasi. Elitisme memastikan solusi terbaik tidak hilang.
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabel Perbandingan -->
+          <div class="card tentang-card mb-4">
+            <div class="card-header">⚖️ Perbandingan Ketiga Algoritma</div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="tabel-komp w-100">
+                  <thead>
+                    <tr>
+                      <th>Aspek</th>
+                      <th>🏔️ Hill Climbing</th>
+                      <th>🌡️ Simulated Annealing</th>
+                      <th>🧬 Genetic Algorithm</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Jumlah solusi</td>
+                      <td>1 solusi tunggal</td>
+                      <td>1 solusi tunggal</td>
+                      <td>Populasi banyak solusi</td>
+                    </tr>
+                    <tr>
+                      <td>Local optimum</td>
+                      <td class="teks-bahaya">Mudah terjebak</td>
+                      <td class="teks-peringatan">Bisa lolos (probabilistik)</td>
+                      <td class="teks-sukses">Jarang terjebak, banyak solusi dicoba bersamaan</td>
+                    </tr>
+                    <tr>
+                      <td>Kecepatan</td>
+                      <td class="teks-sukses">Paling cepat</td>
+                      <td class="teks-peringatan">Sedang</td>
+                      <td class="teks-bahaya">Paling lambat</td>
+                    </tr>
+                    <tr>
+                      <td>Kualitas solusi</td>
+                      <td class="teks-bahaya">Tergantung titik awal</td>
+                      <td class="teks-peringatan">Lebih baik dari HC</td>
+                      <td class="teks-sukses">Umumnya terbaik</td>
+                    </tr>
+                    <tr>
+                      <td>Parameter</td>
+                      <td>Sedikit (iterasi saja)</td>
+                      <td>3 parameter</td>
+                      <td>Banyak parameter</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /tentang-wrapper -->
+      </div>
+
+      <!-- ════════ TAB: PANDUAN PARAMETER ════════ -->
+      <div class="tab-panel d-none" id="hasil-panduan">
+        <div class="tentang-wrapper">
+
+          <div class="tentang-judul-utama mb-4">
+            <h2>📝 Panduan Pengisian Parameter</h2>
+            <p>Penjelasan setiap parameter beserta rekomendasi nilai yang bisa digunakan
+               agar simulasi berjalan dengan baik.</p>
+          </div>
+
+          <!-- Panduan HC -->
+          <div class="card tentang-card mb-4">
+            <div class="card-header tentang-header-hc">🏔️ Parameter Hill Climbing</div>
+            <div class="card-body">
+              <div class="row g-3 mb-3">
+                <div class="col-12">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Varian</div>
+                    <div class="panduan-isi">
+                      <p>Pilih salah satu dari tiga varian:</p>
+                      <ul class="tentang-list">
+                        <li><strong>Simple</strong>: paling cepat, cocok untuk eksplorasi awal. Gunakan ini jika ingin hasil cepat.</li>
+                        <li><strong>Steepest</strong>: lebih cermat karena membandingkan banyak pilihan. Hasilnya lebih konsisten tapi sedikit lebih lambat.</li>
+                        <li><strong>Stochastic</strong>: hasilnya acak tiap run, cocok untuk melihat variasi hasil. Butuh iterasi lebih banyak agar konsisten.</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Jumlah Langkah</div>
+                    <div class="panduan-tabel">
+                      <table class="tabel-panduan">
+                        <thead><tr><th>Nilai</th><th>Efek</th><th>Rekomendasi</th></tr></thead>
+                        <tbody>
+                          <tr><td>500</td><td>Sangat cepat, cukup untuk Simple dan Steepest</td><td>Untuk tes awal</td></tr>
+                          <tr><td>2000</td><td>Cukup untuk sebagian besar kasus</td><td>Penggunaan umum</td></tr>
+                          <tr class="panduan-rekomen"><td>5000</td><td>Konsisten optimal untuk semua varian termasuk Stochastic</td><td>Direkomendasikan</td></tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panduan SA -->
+          <div class="card tentang-card mb-4">
+            <div class="card-header tentang-header-sa">🌡️ Parameter Simulated Annealing</div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Eksplorasi Awal (T₀)</div>
+                    <div class="panduan-isi">
+                      Mengontrol seberapa bebas algoritma mencoba jadwal yang lebih buruk di awal.
+                      <div class="panduan-tabel mt-2">
+                        <table class="tabel-panduan">
+                          <thead><tr><th>Nilai</th><th>Efek</th></tr></thead>
+                          <tbody>
+                            <tr><td>1 - 5</td><td>Eksplorasi terbatas, cepat konvergen</td></tr>
+                            <tr class="panduan-rekomen"><td>10</td><td>Seimbang (direkomendasikan)</td></tr>
+                            <tr><td>20 - 50</td><td>Eksplorasi sangat luas, butuh lebih banyak langkah</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Kecepatan Fokus (alpha)</div>
+                    <div class="panduan-isi">
+                      Seberapa cepat eksplorasi dikurangi tiap langkah. Nilai mendekati 1.0 artinya pendinginan lambat.
+                      <div class="panduan-tabel mt-2">
+                        <table class="tabel-panduan">
+                          <thead><tr><th>Nilai</th><th>Efek</th></tr></thead>
+                          <tbody>
+                            <tr><td>0.90 - 0.95</td><td>Cepat fokus, butuh sedikit langkah</td></tr>
+                            <tr class="panduan-rekomen"><td>0.995</td><td>Lambat fokus, hasil lebih baik (direkomendasikan)</td></tr>
+                            <tr><td>0.999</td><td>Sangat lambat, butuh banyak langkah</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Batas Fokus (T_min)</div>
+                    <div class="panduan-isi">
+                      Algoritma berhenti eksplorasi saat nilai ini tercapai. Nilai kecil artinya eksplorasi berlangsung lebih lama.
+                      <strong>Rekomendasi: 0.001</strong> (default sudah optimal).
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Jumlah Langkah</div>
+                    <div class="panduan-isi">
+                      Batas maksimum percobaan sebagai pengaman.
+                      <strong>Rekomendasi: 3000</strong>. Nilai lebih kecil bisa membuat hasil tidak optimal.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panduan GA -->
+          <div class="card tentang-card mb-4">
+            <div class="card-header tentang-header-ga">🧬 Parameter Genetic Algorithm</div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Jumlah Solusi (Populasi)</div>
+                    <div class="panduan-isi">
+                      Berapa banyak jadwal yang dicoba bersamaan setiap generasi.
+                      <div class="panduan-tabel mt-2">
+                        <table class="tabel-panduan">
+                          <thead><tr><th>Nilai</th><th>Efek</th></tr></thead>
+                          <tbody>
+                            <tr><td>10 - 20</td><td>Cepat tapi kurang beragam</td></tr>
+                            <tr class="panduan-rekomen"><td>50</td><td>Seimbang (direkomendasikan)</td></tr>
+                            <tr><td>100 - 200</td><td>Lebih beragam tapi lebih lambat</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Jumlah Generasi</div>
+                    <div class="panduan-isi">
+                      Berapa kali populasi berevolusi. Lebih banyak generasi artinya pencarian lebih panjang.
+                      <strong>Rekomendasi: 100</strong>. Biasanya sudah cukup untuk mencapai solusi optimal.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Peluang Kawin Silang</div>
+                    <div class="panduan-isi">
+                      Seberapa sering dua jadwal digabung menjadi jadwal baru.
+                      <strong>Rekomendasi: 80%</strong>. Nilai terlalu rendah membuat evolusi lambat,
+                      terlalu tinggi mengurangi variasi.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Peluang Mutasi</div>
+                    <div class="panduan-isi">
+                      Seberapa sering satu slot jadwal berubah secara acak.
+                      <strong>Rekomendasi: 2%</strong>. Nilai terlalu besar membuat pencarian terlalu acak
+                      dan sulit konvergen.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Solusi Terbaik Dijaga (Elitisme)</div>
+                    <div class="panduan-isi">
+                      Berapa jadwal terbaik yang langsung dipertahankan ke generasi berikutnya tanpa diubah.
+                      <strong>Rekomendasi: 2</strong>. Memastikan solusi terbaik tidak hilang akibat mutasi.
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="panduan-item">
+                    <div class="panduan-nama">Ukuran Seleksi (Tournament K)</div>
+                    <div class="panduan-isi">
+                      Dari berapa kandidat acak dipilih satu induk terbaik.
+                      <strong>Rekomendasi: 3</strong>. Nilai lebih besar membuat seleksi lebih ketat
+                      tapi mengurangi keberagaman.
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Panduan Komparatif -->
+          <div class="card tentang-card mb-4">
+            <div class="card-header">📊 Parameter Komparatif B.5</div>
+            <div class="card-body">
+              <div class="panduan-item">
+                <div class="panduan-nama">Maks. Iterasi</div>
+                <div class="panduan-isi">
+                  Batas langkah yang diberikan ke semua algoritma sekaligus untuk perbandingan yang adil.
+                  <div class="panduan-tabel mt-2">
+                    <table class="tabel-panduan">
+                      <thead><tr><th>Nilai</th><th>Efek</th><th>Keterangan</th></tr></thead>
+                      <tbody>
+                        <tr><td>1000</td><td>Cepat, SA mungkin belum optimal</td><td>Untuk demo cepat</td></tr>
+                        <tr><td>3000</td><td>Cukup untuk semua algoritma</td><td>Penggunaan umum</td></tr>
+                        <tr class="panduan-rekomen"><td>5000</td><td>Semua algoritma konsisten optimal</td><td>Direkomendasikan</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ════════ TAB: KELOLA KARYAWAN ════════ -->
+      <div class="tab-panel d-none" id="hasil-karyawan">
+        <div class="tentang-judul-utama mb-4">
+          <h2>👥 Kelola Karyawan</h2>
+          <p>Tambah, hapus, atau ubah nama karyawan yang akan dijadwalkan.
+             Minimal 7 karyawan, maksimal 20 karyawan.</p>
+        </div>
+
+        <!-- Info jumlah karyawan -->
+        <div class="card tentang-card mb-3">
+          <div class="card-header">
+            📊 Status Karyawan Saat Ini
+          </div>
+          <div class="card-body">
+            <div class="stat-grid karyawan-stat-grid">
+              <div class="stat-card">
+                <div class="s-label">Jumlah Karyawan</div>
+                <div class="s-nilai teks-aksen" id="karyawan-jumlah">10</div>
+              </div>
+              <div class="stat-card">
+                <div class="s-label">Status</div>
+                <div class="s-nilai karyawan-status-nilai" id="karyawan-status">Siap</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Form kelola karyawan -->
+        <div class="card tentang-card mb-3">
+          <div class="card-header">✏️ Daftar Karyawan</div>
+          <div class="card-body">
+            <p class="tentang-teks mb-3">
+              Klik nama karyawan untuk mengubahnya. Gunakan tombol tambah untuk
+              menambah karyawan baru, atau hapus untuk menghapus karyawan.
+            </p>
+            <div id="karyawan-list" class="karyawan-grid mb-3"></div>
+            <div class="d-flex gap-2 flex-wrap">
+              <button class="btn-jalankan btn-karyawan-aksi" id="btn-tambah-karyawan">+ Tambah Karyawan</button>
+              <button class="btn-jalankan btn-karyawan-aksi btn-karyawan-sekunder" id="btn-reset-karyawan">↺ Reset ke Default</button>
+              <button class="btn-jalankan btn-karyawan-aksi" id="btn-simpan-karyawan">💾 Simpan Perubahan</button>
+            </div>
+            <div id="karyawan-pesan" class="mt-2"></div>
+          </div>
+        </div>
+
+        <!-- Catatan -->
+        <div class="tentang-kelemahan">
+          ℹ️ <strong>Catatan:</strong> Perubahan karyawan akan berlaku untuk semua simulasi
+          berikutnya. Minimal 7 karyawan diperlukan agar constraint jadwal bisa terpenuhi.
+          Setelah mengubah karyawan, jalankan ulang simulasi untuk mendapatkan jadwal baru.
+        </div>
+      </div>
+
+    </div><!-- /tab-hasil-content -->
+
+  </main>
+
+</div><!-- /layout-wrapper -->
+
+<!-- Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/api.js') }}"></script>
+<script src="{{ url_for('static', filename='js/grafik.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tabel.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+</body>
+</html>
