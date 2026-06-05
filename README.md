@@ -1,10 +1,10 @@
-# 📅 Implementasi Genetic Algorithm pada Sistem Penjadwalan Shift Kerja dengan Visualisasi Interaktif
+# 📅 Optimasi Nonlinear Penjadwalan Shift Kerja Menggunakan Hill Climbing, Simulated Annealing, dan Genetic Algorithm
 
-Aplikasi simulasi web untuk **B.5 — Optimization in Nonlinear Problems**.  
+Aplikasi simulasi web untuk **Optimization in Nonlinear Problems**.  
 Mengimplementasikan dan membandingkan tiga algoritma optimasi pada masalah penjadwalan shift karyawan.
 
 > **Mata Kuliah:** Kecerdasan Buatan  
-> **Topik:** Pencarian Lokal dan Optimasi — **B.5 Optimization in Nonlinear Problems**  
+> **Topik:** Pencarian Lokal dan Optimasi - **Optimization in Nonlinear Problems**  
 > **Algoritma:** Hill Climbing (3 varian) · Simulated Annealing · Genetic Algorithm
 
 ---
@@ -12,7 +12,7 @@ Mengimplementasikan dan membandingkan tiga algoritma optimasi pada masalah penja
 ## 🌐 Demo Aplikasi
 
 🔗 **Live Demo:** [https://shift-scheduler.my.id](https://shift-scheduler.my.id)  
-📦 **Repository:** [https://github.com/username/shift-scheduler](https://github.com/username/shift-scheduler)
+📦 **Repository:** [https://github.com/Alnazh/shift-scheduler](https://github.com/Alnazh/shift-scheduler)
 
 ---
 
@@ -57,7 +57,7 @@ shift-scheduler/
 │   ├── __init__.py
 │   ├── hill_climbing.py        # Simple, Steepest-Ascent, Stochastic HC
 │   ├── simulated_annealing.py  # SA + cooling schedule + prob. Boltzmann
-│   └── genetic_algorithm.py   # GA: tournament, crossover OX, mutasi, elitisme
+│   └── genetic_algorithm.py   # GA: tournament, crossover single-point, mutasi, elitisme
 ├── models/
 │   ├── __init__.py
 │   └── jadwal.py               # Data master, constraint, fungsi fitness
@@ -88,7 +88,7 @@ shift-scheduler/
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/username/shift-scheduler.git
+git clone https://github.com/Alnazh/shift-scheduler.git
 cd shift-scheduler
 
 # 2. Install dependencies
@@ -109,9 +109,9 @@ Buka browser di **`http://localhost:5000`**
 - Ruang solusi: 4^(10×7) = 4^70 ≈ 10^42 kemungkinan (nonlinear, NP-hard)
 
 ### Fungsi Fitness
-```
-fitness = 1 / (1 + total_pelanggaran)
-```
+Solusi dievaluasi berdasarkan jumlah pelanggaran terhadap *constraints*. Fungsi *fitness* dirumuskan sebagai berikut:
+
+$$fitness = \frac{1}{1 + \text{total\_pelanggaran}}$$
 
 ### Constraint yang Dievaluasi
 1. Minimum karyawan per shift per hari (Pagi≥2, Siang≥2, Malam≥1)
@@ -162,28 +162,16 @@ fitness = 1 / (1 + total_pelanggaran)
 
 ---
 
-## 🚢 Deployment ke Railway
-
-```bash
-# Pastikan Procfile sudah ada:
-# web: gunicorn app:app --bind 0.0.0.0:$PORT
-
-# Push ke GitHub, lalu connect repository ke Railway
-# Set environment variable PORT akan diatur otomatis oleh Railway
-```
+## 📸 Tangkapan Layar
+![Dashboard Komparatif](static/img/screenshot_web.png)
 
 ---
 
-## 📚 Referensi
+# 📅 Komparasi Algoritma Metaheuristik pada Sistem Penjadwalan Shift Kerja dengan Visualisasi Interaktif
 
-1. Russell, S., & Norvig, P. (2020). *Artificial Intelligence: A Modern Approach* (4th ed.). Pearson.
-2. Holland, J. H. (1992). *Adaptation in Natural and Artificial Systems*. MIT Press.
-3. Kirkpatrick, S., Gelatt, C. D., & Vecchi, M. P. (1983). Optimization by Simulated Annealing. *Science*, 220(4598), 671–680.
-4. Goldberg, D. E. (1989). *Genetic Algorithms in Search, Optimization, and Machine Learning*. Addison-Wesley.
-5. Burke, E. K., & Kendall, G. (2005). *Search Methodologies: Introductory Tutorials in Optimization and Decision Support Techniques*. Springer.
+Aplikasi simulasi web untuk pemecahan **B.5 — Optimization in Nonlinear Problems**.  
+Mengimplementasikan, memvisualisasikan, dan membandingkan tiga algoritma optimasi (Hill Climbing, Simulated Annealing, dan Genetic Algorithm) dalam menyelesaikan masalah penjadwalan shift karyawan.
 
----
+> **Mata Kuliah:** Kecerdasan Buatan  
+> **Topik:** Pencarian Lokal dan Optimasi — **B.5 Optimization in Nonlinear Problems** > **Algoritma:** Hill Climbing (3 varian) · Simulated Annealing · Genetic Algorithm
 
-## 📄 Lisensi
-
-MIT License — bebas digunakan untuk keperluan akademik.
