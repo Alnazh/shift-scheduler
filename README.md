@@ -164,10 +164,3 @@ fitness = 1 / (1 + total_pelanggaran)
 
 ## 📸 Tangkapan Layar
 ![Dashboard Komparatif](static/img/screenshot_tampilan_web.png)
-
----
-
-# 📅 Komparasi Algoritma Metaheuristik pada Sistem Penjadwalan Shift Kerja dengan Visualisasi Interaktif
-
-Aplikasi simulasi web untuk pemecahan **Optimization in Nonlinear Problems**.  
-Mengimplementasikan, memvisualisasikan, dan membandingkan tiga algoritma optimasi (Hill Climbing, Simulated Annealing, dan Genetic Algorithm) dalam menyelesaikan masalah penjadwalan shift karyawan.
