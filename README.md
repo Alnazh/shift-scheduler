@@ -163,7 +163,7 @@ fitness = 1 / (1 + total_pelanggaran)
 ---
 
 ## 📸 Tangkapan Layar
-![Dashboard Komparatif](static/img/screenshot_web.png)
+![Dashboard Komparatif](static/img/screenshot_tampilan_web.png)
 
 ---
 
