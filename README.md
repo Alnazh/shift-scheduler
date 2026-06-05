@@ -109,9 +109,9 @@ Buka browser di **`http://localhost:5000`**
 - Ruang solusi: 4^(10×7) = 4^70 ≈ 10^42 kemungkinan (nonlinear, NP-hard)
 
 ### Fungsi Fitness
-Solusi dievaluasi berdasarkan jumlah pelanggaran terhadap *constraints*. Fungsi *fitness* dirumuskan sebagai berikut:
-
-$$fitness = \frac{1}{1 + \text{total\_pelanggaran}}$$
+```
+fitness = 1 / (1 + total_pelanggaran)
+```
 
 ### Constraint yang Dievaluasi
 1. Minimum karyawan per shift per hari (Pagi≥2, Siang≥2, Malam≥1)
@@ -169,9 +169,5 @@ $$fitness = \frac{1}{1 + \text{total\_pelanggaran}}$$
 
 # 📅 Komparasi Algoritma Metaheuristik pada Sistem Penjadwalan Shift Kerja dengan Visualisasi Interaktif
 
-Aplikasi simulasi web untuk pemecahan **B.5 — Optimization in Nonlinear Problems**.  
+Aplikasi simulasi web untuk pemecahan **Optimization in Nonlinear Problems**.  
 Mengimplementasikan, memvisualisasikan, dan membandingkan tiga algoritma optimasi (Hill Climbing, Simulated Annealing, dan Genetic Algorithm) dalam menyelesaikan masalah penjadwalan shift karyawan.
-
-> **Mata Kuliah:** Kecerdasan Buatan  
-> **Topik:** Pencarian Lokal dan Optimasi — **B.5 Optimization in Nonlinear Problems** > **Algoritma:** Hill Climbing (3 varian) · Simulated Annealing · Genetic Algorithm
-
