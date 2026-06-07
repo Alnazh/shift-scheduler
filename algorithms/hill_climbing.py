@@ -1,26 +1,3 @@
-"""
-algorithms/hill_climbing.py
-============================
-Implementasi algoritma Hill Climbing untuk optimasi jadwal shift.
-
-Ide dasarnya sederhana:
-  Mulai dari jadwal acak → coba jadwal tetangga yang sedikit berbeda
-  → kalau lebih baik, pindah ke sana → ulangi sampai tidak ada lagi
-  yang bisa diperbaiki atau iterasi habis.
-
-Ada tiga varian yang diimplementasikan:
-  1. Simple         - evaluasi 1 tetangga, langsung pindah kalau lebih baik
-  2. Steepest-Ascent - bandingkan banyak tetangga, pilih yang terbaik
-  3. Stochastic     - pilih tetangga acak, pindah hanya kalau lebih baik
-
-Catatan Steepest-Ascent:
-  Mengevaluasi 80 tetangga per iterasi untuk keputusan yang lebih baik.
-  Menggunakan random restart jika stagnan untuk menghindari local optimum.
-
-Mata Kuliah : Kecerdasan Buatan
-Topik       : Pencarian Lokal dan Optimasi (B.5)
-"""
-
 import random
 import time
 

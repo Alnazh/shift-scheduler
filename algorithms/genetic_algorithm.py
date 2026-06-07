@@ -1,27 +1,3 @@
-"""
-algorithms/genetic_algorithm.py
-================================
-Implementasi Genetic Algorithm (GA) untuk optimasi jadwal shift.
-
-Terinspirasi dari evolusi biologis:
-  - Setiap jadwal = satu individu (kromosom)
-  - Kumpulan jadwal = populasi
-  - Jadwal yang lebih baik → lebih mungkin dipilih sebagai induk
-  - Dua induk menghasilkan anak melalui crossover
-  - Anak bisa bermutasi secara acak
-  - Elitisme: jadwal terbaik langsung dipertahankan ke generasi berikutnya
-
-Komponen utama yang diimplementasikan:
-  1. Inisialisasi populasi acak
-  2. Seleksi tournament
-  3. Crossover single-point
-  4. Mutasi per-gen
-  5. Elitisme
-
-Mata Kuliah : Kecerdasan Buatan
-Topik       : Pencarian Lokal dan Optimasi (B.5)
-"""
-
 import random
 import time
 
@@ -31,7 +7,6 @@ from models.jadwal import (
     hitung_pelanggaran, hitung_fitness,
     jadwal_ke_list,
 )
-
 
 # ──────────────────────────────────────────────
 # 1. INISIALISASI POPULASI

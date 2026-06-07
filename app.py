@@ -1,26 +1,3 @@
-"""
-app.py
-======
-Aplikasi Flask untuk Simulasi Optimasi Penjadwalan Shift Karyawan.
-Subtopik B.5 — Optimization in Nonlinear Problems.
-
-Mengimplementasikan dan membandingkan tiga algoritma:
-  - Hill Climbing (Simple, Steepest-Ascent, Stochastic)
-  - Simulated Annealing
-  - Genetic Algorithm
-
-Cara menjalankan:
-    pip install flask flask-cors
-    python app.py
-
-Lalu buka browser di: http://localhost:5000
-
-Mata Kuliah : Kecerdasan Buatan
-Topik       : Pencarian Lokal dan Optimasi (B.5)
-Judul       : Implementasi Genetic Algorithm pada Sistem
-              Penjadwalan Shift Kerja dengan Visualisasi Interaktif
-"""
-
 from flask import Flask, render_template, jsonify, request, send_file
 from flask_cors import CORS
 import io

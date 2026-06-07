@@ -1,17 +1,3 @@
-"""
-models/jadwal.py
-================
-Berisi semua data dasar yang dipakai simulasi:
-- Daftar nama karyawan (bisa diubah secara dinamis)
-- Definisi shift dan hari kerja
-- Aturan constraint jadwal
-- Fungsi untuk membuat jadwal acak
-- Fungsi untuk menghitung seberapa bagus sebuah jadwal (fitness)
-
-Mata Kuliah : Kecerdasan Buatan
-Topik       : Pencarian Lokal dan Optimasi (B.5)
-"""
-
 import random
 import copy
 
